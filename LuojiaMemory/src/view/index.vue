@@ -9,7 +9,7 @@
     </div>
     <header></header>
     <div id="map"></div>
-    <div id="publish" @click="publish">add</div>
+    <div id="publish" @click="publish">+</div>
     <Modal title="About" ref="modal" @refresh="getData"/>
     <Msgbox v-show="msgBoxShow" ref="msgBox" @refresh="getData"/>
     <Itembox v-show="itemBoxShow" ref="itemBox" @cancel="cancel" @refresh="getData"/>
@@ -63,8 +63,6 @@ export default {
     Itembox
   },
   mounted() {
-    // 获取定位数据
-    this.getPosition();
     let self = this;
     let docHeight = window.innerHeight;
     document.querySelector("#box").style.height = docHeight + "px";
@@ -79,9 +77,7 @@ export default {
     aMapScript.onload = function() {
       self.getMap();
     };
-
-    // 初始化数据
-    this.getData();
+    
   },
   methods: {
     getData() {
@@ -114,7 +110,38 @@ export default {
       //   heightFactor: 2 //2倍于默认高度，3D下有效
       // }); //楼块图层
       let self = this;
+      // 加载地图
       this.Map = new AMap.Map("map", self.mapInfo);
+
+      // 使用定位插件
+      this.Map.plugin("AMap.Geolocation", function() {
+        var geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true, //是否使用高精度定位，默认:true
+          timeout: 5000, //超过10秒后停止定位，默认：无穷大
+          maximumAge: 1000, //定位结果缓存0毫秒，默认：0
+          convert: true, //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+          showButton: true, //显示定位按钮，默认：true
+          buttonPosition: "LB", //定位按钮停靠位置，默认：'LB'，左下角
+          buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+          showMarker: true, //定位成功后在定位到的位置显示点标记，默认：true
+          showCircle: true, //定位成功后用圆圈表示定位精度范围，默认：true
+          panToLocation: true, //定位成功后将定位到的位置作为地图中心点，默认：true
+          zoomToAccuracy: true //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+        });
+        self.Map.addControl(geolocation);
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, "complete", function(res) {
+          console.log(res);
+          self.position.latitude = res.position.N;
+          self.position.longitude = res.position.L;
+          self.getData();
+        }); //返回定位信息
+        AMap.event.addListener(geolocation, "error", function(err) {
+          console.log(err);
+        }); //返回定位出错信息
+      });
+
+      // 设置地图中心点
       this.Map.setZoomAndCenter(18, [
         this.position.longitude,
         this.position.latitude
@@ -122,33 +149,33 @@ export default {
     },
     getPosition() {
       let that = this;
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          function(position) {
-            console.log(position);
-            that.position.latitude = position.coords.latitude;
-            that.position.longitude = position.coords.longitude;
-          },
-          function(error) {
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                alert("用户拒绝对获取地理位置的请求。");
-                break;
-              case error.POSITION_UNAVAILABLE:
-                alert("位置信息是不可用的。");
-                break;
-              case error.TIMEOUT:
-                alert("请求用户地理位置超时。");
-                break;
-              case error.UNKNOWN_ERROR:
-                alert("未知错误。");
-                break;
-            }
-          }
-        );
-      } else {
-        alert("浏览器不支持定位！");
-      }
+      // if (navigator.geolocation) {
+      //   navigator.geolocation.watchPosition(
+      //     function(position) {
+      //       console.log(position);
+      //       that.position.latitude = position.coords.latitude;
+      //       that.position.longitude = position.coords.longitude;
+      //     },
+      //     function(error) {
+      //       switch (error.code) {
+      //         case error.PERMISSION_DENIED:
+      //           alert("用户拒绝对获取地理位置的请求。");
+      //           break;
+      //         case error.POSITION_UNAVAILABLE:
+      //           alert("位置信息是不可用的。");
+      //           break;
+      //         case error.TIMEOUT:
+      //           alert("请求用户地理位置超时。");
+      //           break;
+      //         case error.UNKNOWN_ERROR:
+      //           alert("未知错误。");
+      //           break;
+      //       }
+      //     }
+      //   );
+      // } else {
+      //   alert("浏览器不支持定位！");
+      // }
     },
     // confirm(textContent) {
     //   if (textContent.length == 0) {
@@ -212,11 +239,11 @@ export default {
       if (dis >= 1000) {
         dis = (dis / 1000).toString();
         let index = dis.indexOf(".");
-        return dis.slice(0, index + 2)+"km";
+        return dis.slice(0, index + 2) + "km";
       } else {
-        dis=dis.toString();
+        dis = dis.toString();
         let index = dis.indexOf(".");
-        return dis.slice(0, index + 2)+"m";
+        return dis.slice(0, index + 2) + "m";
       }
     }
   }
@@ -289,8 +316,8 @@ header {
   text-align: center;
   color: #000;
   line-height: 60px;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 40px;
+  font-weight: 500;
 }
 #publish:hover {
   background-color: #5cadff;
