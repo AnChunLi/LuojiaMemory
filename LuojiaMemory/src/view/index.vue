@@ -5,7 +5,9 @@
       <div id="left" @click="expand">
         <img :src="icon_img" alt style="width:30px;height:30px;margin:5px 0;">
       </div>
-      <!-- <div id="right" @click="changeStyle">涂鸦</div> -->
+      <div id="right">
+        <img :src="change" @click="changeStyle" style="width:30px;height:30px;margin:5px 0;">
+      </div>
     </div>
     <header></header>
     <div id="map"></div>
@@ -25,6 +27,7 @@ import Itembox from "../components/itemBox";
 import left from "@/assets/icon/left.png";
 import right from "@/assets/icon/right.png";
 import fire from "@/assets/icon/fire.gif";
+import change from "@/assets/icon/icon_change.png";
 
 import { get } from "../utils/httputil.js";
 
@@ -36,15 +39,24 @@ export default {
       left,
       right,
       icon_img: right,
+      change,
       itemBoxShow: false,
       msgBoxShow: false,
       Map: {},
+      currentStyle: 0,
+      MapStyle: [
+        "amap://styles/whitesmoke",
+        "amap://styles/darkblue",
+        "amap://styles/macaron",
+        "amap://styles/dark",
+        "amap://styles/light"
+      ],
       mapInfo: {
-        mapStyle: "amap://styles/darkblue",
+        mapStyle: "amap://styles/whitesmoke",
         resizeEnable: true,
         pitch: 58, // 地图俯仰角度，有效范围 0 度- 83 度
         viewMode: "3D" // 地图模式
-        // layers: [satellite]
+        // layers: [this.roadNet]
       },
       position: {
         latitude: null,
@@ -77,7 +89,6 @@ export default {
     aMapScript.onload = function() {
       self.getMap();
     };
-    
   },
   methods: {
     getData() {
@@ -103,7 +114,7 @@ export default {
     },
     getMap() {
       // var satellite = new AMap.TileLayer.Satellite();
-      // var roadNet = new AMap.TileLayer.RoadNet();
+      // this.roadNet = new AMap.TileLayer.RoadNet();
       // var buildings = new AMap.Buildings({
       //   zooms: [16, 18],
       //   zIndex: 10,
@@ -188,15 +199,19 @@ export default {
       this.$refs.modal.onShow(this.position);
     },
     changeStyle() {
-      // console.log(this.mapInfo.mapStyle);
       // if(this.mapInfo.mapStyle=="amap://styles/graffiti"){
       //   this.mapInfo.mapStyle = "amap://styles/darkblue";
       // }else{
       //   this.mapInfo.mapStyle="amap://styles/graffiti";
       // }
-      // console.log(this.mapInfo.mapStyle);
+      if(this.currentStyle==this.MapStyle.length-1){
+        this.currentStyle=0;
+      }else{
+        this.currentStyle++;
+      }
+      this.mapInfo.mapStyle=this.MapStyle[this.currentStyle];
       // this.Map.destroy();
-      // this.getMap();
+      this.getMap();
     },
     expand() {
       // this.$refs.msgBox.getData(this.releaseList);
