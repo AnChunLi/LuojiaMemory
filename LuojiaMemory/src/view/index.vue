@@ -1,6 +1,6 @@
 <template>
   <div id="box">
-    <div id="title">LuojiaMemory</div>
+    <div id="title">若比邻</div>
     <div id="top">
       <div id="left" @click="expand">
         <img :src="icon_img" alt style="width:30px;height:30px;margin:5px 0;">
@@ -12,9 +12,10 @@
     <header></header>
     <div id="map"></div>
     <div id="publish" @click="publish">+</div>
-    <Modal title="About" ref="modal" @refresh="getData"/>
-    <Msgbox v-show="msgBoxShow" ref="msgBox" @refresh="getData"/>
-    <Itembox v-show="itemBoxShow" ref="itemBox" @cancel="cancel" @refresh="getData"/>
+    <Modal title="About" ref="modal" @refresh="getData" @preview="preview"/>
+    <Msgbox v-show="msgBoxShow" ref="msgBox" @refresh="getData" @preview="preview"/>
+    <Itembox v-show="itemBoxShow" ref="itemBox" @cancel="cancel" @refresh="getData" @preview="preview"/>
+    <previewimg :imgUrl="previewImg" v-show="isPreview" @cancelPreview="cancelPreview"/>
   </div>
 </template>
  
@@ -23,6 +24,7 @@
 import Modal from "../components/modal.vue";
 import Msgbox from "../components/messageBox.vue";
 import Itembox from "../components/itemBox";
+import previewimg from "../components/previewImg.vue";
 
 import left from "@/assets/icon/left.png";
 import right from "@/assets/icon/right.png";
@@ -66,13 +68,18 @@ export default {
         title: "About",
         content: "毕业生留念地图..."
       },
-      releaseList: []
+      releaseList: [],
+      // 图片预览路径
+      previewImg:"",
+      // 是否预览
+      isPreview:false
     };
   },
   components: {
     Modal,
     Msgbox,
-    Itembox
+    Itembox,
+    previewimg
   },
   mounted() {
     let self = this;
@@ -100,6 +107,9 @@ export default {
             let list = res.data.data;
             for (let i = 0; i < list.length; i++) {
               list[i].dis = that.getDis(list[i].longitude, list[i].latitude);
+              if(list[i].image!=""){
+                list[i].imgList=list[i].image.split("#");
+              }
             }
             that.releaseList = list;
             console.log(that.releaseList);
@@ -218,6 +228,7 @@ export default {
       if (this.icon_img == this.right) {
         this.icon_img = this.left;
         this.msgBoxShow = true;
+        this.$refs.msgBox.addAnimate();
       } else {
         this.icon_img = this.right;
         this.msgBoxShow = false;
@@ -260,6 +271,14 @@ export default {
         let index = dis.indexOf(".");
         return dis.slice(0, index + 2) + "m";
       }
+    },
+    // 图片预览
+    preview(img){
+      this.previewImg=img;
+      this.isPreview=true;
+    },
+    cancelPreview(){
+      this.isPreview=false;
     }
   }
 };
@@ -294,8 +313,10 @@ header {
   height: 40px;
   color: #ffffff;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 40px;
+  font-style: oblique;
+  letter-spacing: 10px;
 }
 #top {
   position: absolute;
@@ -333,6 +354,7 @@ header {
   line-height: 60px;
   font-size: 40px;
   font-weight: 500;
+  cursor: pointer;
 }
 #publish:hover {
   background-color: #5cadff;

@@ -2,6 +2,9 @@
   <div id="itemBox" @click="cancel">
     <div id="dis">距离：{{item.dis}}</div>
     <div id="content">{{item.content}}</div>
+    <div id="imgBox">
+      <img :src="img" v-for="img in item.imgList" :key="img" @click.stop="preview(img)">
+    </div>
     <div id="center">
       <div id="hot">
         <img :src="hot">
@@ -48,6 +51,11 @@ export default {
         },
         err => {}
       );
+    },
+    // 图片预览
+    preview(img) {
+      
+      this.$emit("preview", img);
     }
   }
 };
@@ -67,9 +75,9 @@ export default {
   border-radius: 20px;
   animation: slideInUp 200ms;
 }
-#itemBox #dis{
+#itemBox #dis {
   width: 80%;
-  height:20px;
+  height: 20px;
   margin: 10px 10%;
   line-height: 20px;
   font-size: 12px;
@@ -81,6 +89,24 @@ export default {
   margin: 2px 10% 20px 10%;
   text-align: left;
   word-break: break-all;
+}
+#itemBox #imgBox {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 80%;
+  min-height: 0px;
+  margin: 10px 10%;
+}
+#itemBox #imgBox img {
+  width: 80px;
+  height: 80px;
+  background-color: #fff;
+  /* background: transparent; */
+  opacity: 1;
+  border-radius: 10px;
+  margin: 0 4px;
 }
 #itemBox #center {
   display: inline-flex;

@@ -11,7 +11,12 @@
     $longitude=$_POST['longitude'];
     $latitude=$_POST['latitude'];
     $time=date("Y/m/d H:i:s",time()+8*3600);
-    $sql="INSERT INTO releases (content,time,longitude,latitude) VALUES ('$content','$time','$longitude','$latitude')";
+    if(isset($_POST['img'])){
+        $image=$_POST['img'];
+        $sql="INSERT INTO releases (content,time,longitude,latitude,image) VALUES ('$content','$time','$longitude','$latitude','$image')";
+    }else{
+        $sql="INSERT INTO releases (content,time,longitude,latitude) VALUES ('$content','$time','$longitude','$latitude')";
+    }
     $is=$db->query($sql);
     if($is){
         echo json_encode(array("code"=>0,"msg"=>"insert success"));

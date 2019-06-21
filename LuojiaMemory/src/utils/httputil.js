@@ -1,8 +1,8 @@
 import Qs from 'qs';
 import Axios from 'axios';
 
-// let baseUrl = "http://localhost:9999/"
-let baseUrl = "https://1758541396.cn/LuojiaMemoryServer/";
+// export let baseUrl = "http://localhost:9999/"
+export let baseUrl = "https://1758541396.cn/LuojiaMemoryServer/";
 // function get(url,cbok,cberr){
 //     Axios.get();
 // }
