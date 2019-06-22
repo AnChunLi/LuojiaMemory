@@ -4,7 +4,11 @@
     header('Access-Control-Allow-Origin:*');
     include("../public/config.php");
     $id=$_GET['id'];
-    $sql="UPDATE releases SET hot=hot+1 WHERE id = '$id'";
+    if(isset($_GET['cancellike'])){
+        $sql="UPDATE releases SET hot=hot-1 WHERE id = '$id'";
+    }else{
+        $sql="UPDATE releases SET hot=hot+1 WHERE id = '$id'";
+    }
     $result=$db->query($sql);
     if($result){
         echo json_encode(array('code'=>0,'msg'=>'success!'));

@@ -16,7 +16,7 @@
         <div id="time">{{item.time}}</div>
       </div>
       <div id="like">
-        <img :src="like" @click.stop="liked(item.id)">
+        <img :src="item.isLiked==1?like:to_like" @click.stop="liked(item.id)">
       </div>
     </div>
   </div>
@@ -24,9 +24,11 @@
 
 <script>
 import like from "@/assets/icon/liked.png";
+import to_like from"@/assets/icon/to_like.png"
 import hot from "@/assets/icon/fire.gif";
 
 import { get } from "../utils/httputil.js";
+import { toLike} from "../data/like.js";
 
 export default {
   data() {
@@ -34,6 +36,7 @@ export default {
       boxClass: "",
       showSelect: true,
       like,
+      to_like,
       hot,
       list: [],
       initList:[],
@@ -75,16 +78,22 @@ export default {
       this.list = data;
     },
     liked(id) {
-      let that = this;
-      get(
-        "release/addLike.php?id=" + id,
-        res => {
-          if (res.data.code == 0) {
-            that.$emit("refresh");
-          }
-        },
-        err => {}
-      );
+      // let that = this;
+      // get(
+      //   "release/addLike.php?id=" + id,
+      //   res => {
+      //     if (res.data.code == 0) {
+      //       that.$emit("refresh");
+      //     }
+      //   },
+      //   err => {}
+      // );
+      toLike(id).then(()=>{
+        this.$emit("refresh");
+      })
+      // .catch(()=>{
+      //   alert("服务器错误！");
+      // });
     },
     // 图片预览
     preview(img) {
@@ -158,6 +167,7 @@ export default {
 #select {
   width: 40%;
   height: 20px;
+  line-height: 20px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 20px;
   margin: 20px 30%;

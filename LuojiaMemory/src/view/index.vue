@@ -98,13 +98,38 @@ export default {
     };
   },
   methods: {
+    // 全局数据更新
     getData() {
       let that = this;
+      // 本地存储更新判断
+      let getToArr=function(arr){
+        if(localStorage.getItem('list')){
+          var lastList=JSON.parse(localStorage.getItem('list'));
+        }else{
+          var lastList=[];
+        }
+        for(let i=0,len=arr.length;i<len;i++){
+          // 判断动态是否新增
+          let isExt=false;
+          for(let j=0;j<lastList.length;j++){
+            if(arr[i].id==lastList[j].id){
+              isExt=true;
+              // 如果动态不是新增就要更新其点赞数
+              lastList[j].hot=arr[i].hot;
+            }
+          }
+          if(!isExt){
+            arr[i].isLiked=0;
+            lastList.push(arr[i]);
+          }
+        }
+        return lastList;
+      }
       get(
         "release/getList.php",
         res => {
           if (res.data.code == 0) {
-            let list = res.data.data;
+            let list = getToArr(res.data.data);
             for (let i = 0; i < list.length; i++) {
               list[i].dis = that.getDis(list[i].longitude, list[i].latitude);
               if(list[i].image!=""){
@@ -113,6 +138,8 @@ export default {
             }
             that.releaseList = list;
             console.log(that.releaseList);
+            // 本地存储
+            localStorage.setItem('list',JSON.stringify(list));
             that.$refs.msgBox.getData(that.releaseList);
             that.makeMarker();
           } else {
@@ -207,6 +234,8 @@ export default {
     // },
     publish() {
       this.$refs.modal.onShow(this.position);
+      this.msgBoxShow=false;
+      this.icon_img=this.right;
     },
     changeStyle() {
       // if(this.mapInfo.mapStyle=="amap://styles/graffiti"){

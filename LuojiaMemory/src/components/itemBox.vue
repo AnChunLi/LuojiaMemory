@@ -13,22 +13,25 @@
       <div id="time">{{item.time}}</div>
     </div>
     <div id="like">
-      <img :src="like" @click.stop="liked">
+      <img :src="item.isLiked==1?like:to_like" @click.stop="liked">
     </div>
   </div>
 </template>
 
 <script>
 import like from "@/assets/icon/liked.png";
+import to_like from"@/assets/icon/to_like.png"
 import hot from "@/assets/icon/fire.gif";
 
 import { get } from "../utils/httputil.js";
+import { toLike } from "../data/like.js";
 
 export default {
   data() {
     return {
       item: {},
       like,
+      to_like,
       hot
     };
   },
@@ -40,21 +43,30 @@ export default {
       this.$emit("cancel");
     },
     liked() {
-      let that = this;
-      get(
-        "release/addLike.php?id=" + this.item.id,
-        res => {
-          if (res.data.code == 0) {
-            that.item.hot++;
-            that.$emit("refresh");
-          }
-        },
-        err => {}
-      );
+      // let that = this;
+      // get(
+      //   "release/addLike.php?id=" + this.item.id,
+      //   res => {
+      //     if (res.data.code == 0) {
+      //       that.item.hot++;
+      //       that.$emit("refresh");
+      //     }
+      //   },
+      //   err => {}
+      // );
+      toLike(this.item.id).then((e) => {
+        if(e==1){
+          this.item.hot++;
+          this.item.isLiked=1;
+        }else{
+          this.item.hot--;
+          this.item.isLiked=0;
+        }
+        this.$emit("refresh");
+      });
     },
     // 图片预览
     preview(img) {
-      
       this.$emit("preview", img);
     }
   }
