@@ -180,8 +180,8 @@ export default {
         geolocation.getCurrentPosition();
         AMap.event.addListener(geolocation, "complete", function(res) {
           console.log(res);
-          self.position.latitude = res.position.N;
-          self.position.longitude = res.position.L;
+          self.position.latitude = res.position.lat;
+          self.position.longitude = res.position.lng;
           self.getData();
         }); //返回定位信息
         AMap.event.addListener(geolocation, "error", function(err) {

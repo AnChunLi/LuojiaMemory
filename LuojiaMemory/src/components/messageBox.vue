@@ -106,7 +106,7 @@ export default {
     changeList() {
       let msgBox = document.querySelector("#msg");
       var addAnimate = () => {
-        msgBox.style.animation="flip 200ms";
+        msgBox.style.animation="flip 400ms";
       };
       msgBox.addEventListener("animationend",function(e){
         msgBox.style.animation="";

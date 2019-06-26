@@ -3,7 +3,7 @@
     header('Access-Control-Request-Method: GET');
     header('Access-Control-Allow-Origin:*');
     include("../public/config.php");
-    $sql="SELECT * FROM releases ORDER BY hot DESC";
+    $sql="SELECT * FROM releases WHERE is_delete=0 ORDER BY hot DESC";
     $result=$db->query($sql);
     $releaseList=[];
     while($row=$result->fetch_assoc()){
